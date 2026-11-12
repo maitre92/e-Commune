@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Providers;
+
+use App\Models\Mairie;
+use App\Models\Permission;
+use App\Models\User;
+use App\Services\Users\SuperadminBootstrapper;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Console\Events\CommandFinished;
+use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        $this->app->singleton(SuperadminBootstrapper::class);
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        // Le superadmin contourne l'autorisation (Gate::before), pas la logique métier ni l'audit (ARCHITECTURE §1, D16).
+        Gate::before(fn ($user, string $ability) => $user instanceof User && $user->isSuperadmin() ? true : null);
+
+        // D14 : 8 caractères au moins, lettres et chiffres.
+        Password::defaults(fn () => Password::min(8)->letters()->numbers());
+
+        // Superadmins créés automatiquement s'ils n'existent pas (D27) : au lancement du serveur de développement et après
+        // chaque migration (déploiement). La première visite de la page de connexion est le filet pour l'hébergement Web.
+        Event::listen(CommandStarting::class, function (CommandStarting $event) {
+            if ($event->command === 'serve') {
+                app(SuperadminBootstrapper::class)->ensure();
+            }
+        });
+        Event::listen(CommandFinished::class, function (CommandFinished $event) {
+            if ($event->exitCode === 0 && in_array($event->command, ['migrate', 'migrate:fresh', 'migrate:refresh', 'permissions:sync'], true)) {
+                app(SuperadminBootstrapper::class)->ensure();
+            }
+        });
+
+        // Application mobile : 120 requêtes par minute et par utilisateur.
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->getKey() ?: $request->ip()));
+
+        // Seule route publique : la vérification d'une vignette par son QR Code, limitée par IP.
+        RateLimiter::for('public', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
+
+        // Alias morph stables : ils s'écrivent dans activity_logs, model_has_roles et personal_access_tokens.
+        Relation::morphMap([
+            'user' => User::class,
+            'mairie' => Mairie::class,
+            'permission' => Permission::class,
+            'role' => Role::class,
+        ]);
+    }
+}

@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\Genre;
+use App\Models\Concerns\BelongsToMairie;
+use App\Models\Concerns\LogsActivity;
+use Database\Factories\ProprietaireFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * Propriétaire d'une ou plusieurs motos, enregistré par l'agent de la mairie avant la délivrance d'une vignette.
+ * Cloisonné par mairie (BelongsToMairie) : invisible des autres mairies.
+ */
+#[Fillable(['mairie_id', 'first_name', 'last_name', 'gender', 'address', 'phone', 'emergency_contact'])]
+class Proprietaire extends Model
+{
+    /** @use HasFactory<ProprietaireFactory> */
+    use BelongsToMairie, HasFactory, LogsActivity, SoftDeletes;
+
+    protected function casts(): array
+    {
+        return ['gender' => Genre::class];
+    }
+
+    /** @return HasMany<Moto, $this> */
+    public function motos(): HasMany
+    {
+        return $this->hasMany(Moto::class);
+    }
+
+    public function fullName(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function activityNoun(): string
+    {
+        return 'Propriétaire';
+    }
+
+    public function activityLabel(): string
+    {
+        return $this->fullName();
+    }
+}

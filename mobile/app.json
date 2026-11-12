@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "e-Commune",
+    "slug": "e-commune",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "ecommune",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "ml.ecommune.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#0f5132",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      },
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#123a63"
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "e-Commune utilise vos photos pour votre photo de profil.",
+          "cameraPermission": "e-Commune utilise l'appareil photo pour votre photo de profil."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {}
+    }
+  }
+}
