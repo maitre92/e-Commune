@@ -23,7 +23,12 @@
         @foreach ($slides as $index => $slide)
             <div class="bg-caption @if ($index === 0) active @endif" data-index="{{ $index }}">
                 <span class="bg-badge"><i class="{{ $slide['icon'] }}"></i> {{ $slide['badge'] }}</span>
-                <h2 class="bg-title">{{ $slide['title'] }}</h2>
+                @if ($slide['write'] ?? false)
+                    {{-- Titre écrit au stylo, lettre à lettre (script plus bas) ; le texte complet reste lisible sans script. --}}
+                    <h2 class="bg-title bg-title--write" data-write="{{ $slide['title'] }}"><span class="write-text">{{ $slide['title'] }}</span><i class="bx bx-pen write-pen" aria-hidden="true"></i></h2>
+                @else
+                    <h2 class="bg-title">{{ $slide['title'] }}</h2>
+                @endif
                 <p class="bg-text">{{ $slide['text'] }}</p>
             </div>
         @endforeach
@@ -116,6 +121,10 @@
         }
 
         .bg-title { color: #fff; font-size: clamp(1.4rem, 2.4vw, 2.2rem); font-weight: 800; margin: 0 0 .6rem; text-shadow: 0 2px 14px rgba(0, 0, 0, .45); }
+        .bg-title--write { font-family: 'Segoe Script', 'Brush Script MT', 'URW Chancery L', cursive; font-style: italic; min-height: 1.3em; }
+        .write-pen { display: inline-block; margin-left: .15em; color: #fcd116; transform: rotate(-12deg); transform-origin: bottom left; }
+        .bg-title--write.is-writing .write-pen { animation: penWrite .28s ease-in-out infinite alternate; }
+        @keyframes penWrite { from { transform: rotate(-16deg) translateY(0); } to { transform: rotate(4deg) translateY(-4px); } }
         .bg-text { color: rgba(255, 255, 255, .88); font-size: clamp(.85rem, 1vw, 1.05rem); color: rgba(255, 255, 255, .85); margin: 0; text-shadow: 0 1px 8px rgba(0, 0, 0, .45); }
 
         .bg-dots { position: fixed; left: 6vw; bottom: 90px; z-index: 3; display: flex; gap: .5rem; pointer-events: auto; }
@@ -210,6 +219,29 @@
             icon.classList.toggle('bx-hide', isPassword);
         });
 
+        // Stylo : écrit lettre à lettre le titre d'une diapositive marquée data-write (« e » comme électronique).
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let penTimer = null;
+        function penWrite(caption) {
+            const title = caption ? caption.querySelector('[data-write]') : null;
+            if (!title || reduceMotion) return;
+            const target = title.querySelector('.write-text');
+            const text = title.dataset.write;
+            clearInterval(penTimer);
+            let n = 0;
+            target.textContent = '';
+            title.classList.add('is-writing');
+            penTimer = setInterval(() => {
+                n += 1;
+                target.textContent = text.slice(0, n);
+                if (n >= text.length) {
+                    clearInterval(penTimer);
+                    title.classList.remove('is-writing');
+                }
+            }, 85);
+        }
+        penWrite(document.querySelector('.bg-caption.active'));
+
         // Diaporama : une image toutes les 6 secondes, ou au clic sur un point.
         (function () {
             const slides = document.querySelectorAll('.bg-slide');
@@ -226,6 +258,7 @@
                     if (list[index]) list[index].classList.add('active');
                 });
                 current = index;
+                penWrite(captions[index]);
             }
 
             function start() {

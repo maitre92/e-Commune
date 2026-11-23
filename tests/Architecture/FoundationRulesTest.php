@@ -76,7 +76,7 @@ class FoundationRulesTest extends TestCase
         $guestOnly = ['login', 'login.store'];
         // Publique sans restriction sur l'état de connexion (une vignette se vérifie qu'on soit connecté ou
         // non) : ni guest, ni auth.
-        $publicWeb = ['vignette.verify'];
+        $publicWeb = ['vignette.verify', 'privacy'];
         $publicApi = ['api.health', 'api.login'];
 
         foreach (Route::getRoutes() as $route) {

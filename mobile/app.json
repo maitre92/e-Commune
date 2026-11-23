@@ -9,11 +9,22 @@
     "userInterfaceStyle": "light",
     "android": {
       "package": "ml.ecommune.mobile",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#0f5132",
-        "foregroundImage": "./assets/images/adaptive-icon.png"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "monochromeImage": "./assets/images/monochrome-icon.png",
+        "backgroundColor": "#0f5132"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -21,8 +32,9 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
+          "imageWidth": 220,
           "resizeMode": "contain",
-          "backgroundColor": "#123a63"
+          "backgroundColor": "#0f5132"
         }
       ],
       "expo-secure-store",
@@ -30,7 +42,8 @@
         "expo-image-picker",
         {
           "photosPermission": "e-Commune utilise vos photos pour votre photo de profil.",
-          "cameraPermission": "e-Commune utilise l'appareil photo pour votre photo de profil."
+          "cameraPermission": "e-Commune utilise l'appareil photo pour votre photo de profil.",
+          "microphonePermission": false
         }
       ]
     ],
@@ -39,6 +52,10 @@
     },
     "extra": {
       "router": {}
+    },
+    "description": "Application des agents de mairie : vignettes de motos, actes de naissance et de mariage, caisse.",
+    "web": {
+      "favicon": "./assets/images/favicon.png"
     }
   }
 }

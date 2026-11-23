@@ -58,6 +58,10 @@ npx expo start          # scanner le QR code avec Expo Go
 npm run typecheck
 ```
 
+Publication sur le **Google Play Store** (build EAS, icônes, bannière, captures, textes de la fiche, sécurité des
+données) : voir [mobile/store/README.md](mobile/store/README.md). Politique de confidentialité publique :
+`/confidentialite`.
+
 ## À valider avant mise en production
 
 - Modèles de carte de vignette et extraits d'actes : à faire valider par les autorités (aucun sceau ni signature

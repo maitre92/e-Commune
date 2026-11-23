@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\RoleName;
 use App\Models\ActeNaissance;
 use App\Models\DemandeVgt;
 use App\Models\Mairie;
@@ -130,5 +131,36 @@ class MobileApiTest extends TestCase
         $this->agent->mairie->update(['civil_centre_type' => 'principal', 'civil_centre_name' => 'Kati', 'civil_officer_name' => 'Mariam Diarra', 'civil_officer_title' => 'Officier']);
         $url = $this->postJson("/api/v1/actes/{$id}/extrait")->assertCreated()->json('extrait_url');
         $this->assertStringContainsString('MARIAM DIARRA', $this->get($url)->getContent());
+    }
+
+    public function test_the_civil_settings_are_read_and_saved_from_the_phone(): void
+    {
+        Sanctum::actingAs($this->agent);
+
+        $this->getJson('/api/v1/etat-civil/reglages')->assertOk()
+            ->assertJsonPath('data.pret', false)
+            ->assertJsonPath('data.civil_centre_type', 'principal')
+            ->assertJsonPath('data.mairie', 'Mairie de Kati');
+
+        $this->putJson('/api/v1/etat-civil/reglages', ['civil_officer_name' => ''])->assertUnprocessable()
+            ->assertJsonValidationErrors(['civil_officer_name', 'civil_centre_name']);
+
+        $this->putJson('/api/v1/etat-civil/reglages', [
+            'civil_officer_name' => 'Mariam Diarra', 'civil_officer_title' => 'Officier de l\'état civil',
+            'civil_centre_type' => 'principal', 'civil_centre_name' => 'Kati', 'civil_region' => 'Koulikoro',
+            'civil_extract_price' => '500', 'civil_marriage_extract_price' => '1 000', 'civil_print_mode' => 'blanc',
+        ])->assertOk()->assertJsonPath('data.pret', true)->assertJsonPath('data.civil_marriage_extract_price', 1000);
+
+        $this->assertSame('Mariam Diarra', $this->agent->mairie->refresh()->civil_officer_name);
+        $this->getJson('/api/v1/actes/nouveau')->assertJsonPath('data.pret', true)->assertJsonPath('data.officier', 'Mariam Diarra');
+    }
+
+    public function test_an_agent_without_the_configure_right_cannot_change_the_civil_settings(): void
+    {
+        $agent = User::factory()->withRole(RoleName::AgentEtatCivil)->create(['mairie_id' => $this->agent->mairie_id, 'phone' => '+22370000060']);
+        Sanctum::actingAs($agent);
+
+        $this->getJson('/api/v1/etat-civil/reglages')->assertForbidden();
+        $this->putJson('/api/v1/etat-civil/reglages', ['civil_officer_name' => 'X'])->assertForbidden();
     }
 }

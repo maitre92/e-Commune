@@ -92,6 +92,26 @@ export interface CivilSettings {
   localite_par_defaut: string | null;
 }
 
+/** Réglages complets de l'état civil (GET/PUT /etat-civil/reglages), écran « Réglages de l'état civil ». */
+export interface CivilSettingsForm {
+  mairie: string;
+  pret: boolean;
+  civil_officer_name: string | null;
+  civil_officer_title: string | null;
+  civil_centre_type: 'principal' | 'secondaire';
+  civil_centre_name: string | null;
+  civil_region: string | null;
+  civil_cercle: string | null;
+  civil_arrondissement: string | null;
+  civil_commune: string | null;
+  civil_birth_place: string | null;
+  civil_extract_price: number | null;
+  civil_marriage_extract_price: number | null;
+  civil_print_mode: 'blanc' | 'preimprime';
+  civil_print_offset_x: number | null;
+  civil_print_offset_y: number | null;
+}
+
 export interface Acte {
   id: number;
   act_number: string;

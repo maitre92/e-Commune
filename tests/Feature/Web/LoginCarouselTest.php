@@ -118,7 +118,7 @@ class LoginCarouselTest extends TestCase
     public function test_a_slide_position_is_applied_to_its_image_and_defaults_to_center(): void
     {
         $this->dropImage('slide-1.jpg');
-        config(['brand.login_slides.0.position' => '10% 20%']);
+        config(['brand.login_slides.1.position' => '10% 20%']); // slide-1 (la 0 est la diapositive du stylo)
 
         $this->get('/login')->assertSee('background-position: 10% 20%;', false);
 
@@ -140,6 +140,14 @@ class LoginCarouselTest extends TestCase
             $this->assertMatchesRegularExpression('/^(\d{1,3}%|left|center|right|top|bottom)( (\d{1,3}%|left|center|right|top|bottom))?$/', $slide['position'] ?? 'center', 'Cadrage CSS invalide.');
         }
         $this->assertSame($slides->count(), $slides->pluck('file')->unique()->count());
+    }
+
+    public function test_the_first_slide_writes_the_meaning_of_the_e_with_a_pen(): void
+    {
+        $this->get('/login')->assertOk()
+            ->assertSee('data-write="« e » comme électronique"', false)
+            ->assertSee('write-pen', false)
+            ->assertSee('function penWrite', false);
     }
 
     public function test_the_carousel_script_and_reduced_motion_support_are_present(): void

@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    | Contact affiché sur la politique de confidentialité (/confidentialite), exigée par le Play Store.
+    */
+    'contact_email' => env('APP_CONTACT_EMAIL'),
+
 ];

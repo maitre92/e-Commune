@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\ActeMariageController;
 use App\Http\Controllers\Api\V1\ActeNaissanceController;
 use App\Http\Controllers\Api\V1\CaisseController;
+use App\Http\Controllers\Api\V1\EtatCivilSettingsController;
 use App\Http\Controllers\Api\V1\VignetteController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,8 @@ Route::middleware(['auth:sanctum', 'active', 'channel:api', 'throttle:api', 'pas
     Route::get('/vignettes', [VignetteController::class, 'index'])->middleware('permission:demandes-vgt.view')->name('api.vignettes.index');
     Route::get('/vignettes/{demandeId}/carte', [VignetteController::class, 'card'])->whereNumber('demandeId')->middleware('permission:demandes-vgt.view')->name('api.vignettes.card');
 
+    Route::get('/etat-civil/reglages', [EtatCivilSettingsController::class, 'show'])->middleware('permission:actes-naissance.configure|actes-mariage.configure')->name('api.etat-civil.settings');
+    Route::put('/etat-civil/reglages', [EtatCivilSettingsController::class, 'update'])->middleware('permission:actes-naissance.configure|actes-mariage.configure')->name('api.etat-civil.settings.update');
     Route::get('/actes', [ActeNaissanceController::class, 'index'])->middleware('permission:actes-naissance.view')->name('api.actes.index');
     Route::get('/actes/nouveau', [ActeNaissanceController::class, 'defaults'])->middleware('permission:actes-naissance.view')->name('api.actes.defaults');
     Route::get('/actes/{acteNaissance}', [ActeNaissanceController::class, 'show'])->middleware('permission:actes-naissance.view')->name('api.actes.show');

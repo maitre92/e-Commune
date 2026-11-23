@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BrandTitle from '@/components/BrandTitle';
+import PenMeaning from '@/components/PenMeaning';
 import { useAuth } from '@/context/AuthContext';
 import { api, API_URL, apiErrorMessage } from '@/lib/api';
 import { colors } from '@/lib/theme';
@@ -53,7 +54,8 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.brand}>
             <BrandTitle size={44} onDark />
-            <Text style={styles.tagline}>VIGNETTES · ÉTAT CIVIL · CAISSE</Text>
+            {/* Le stylo écrit la signification du « e » (électronique), puis les services. */}
+            <PenMeaning />
             {serverDown ? <Text style={styles.down}>Serveur injoignable : {API_URL}</Text> : null}
           </View>
 
@@ -116,7 +118,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.dark },
   content: { flexGrow: 1, justifyContent: 'center', padding: 20, gap: 28 },
   brand: { alignItems: 'center', gap: 6 },
-  tagline: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
   card: { borderRadius: 18 },
   title: { fontWeight: '800', color: colors.text },
   notice: { fontSize: 13 },

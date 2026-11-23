@@ -1,4 +1,4 @@
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput as RNTextInput, View } from 'react-native';
 import { Button, Card, HelperText, IconButton, SegmentedButtons, Text, TextInput } from 'react-native-paper';
@@ -21,7 +21,7 @@ const FIELDS = [
 /**
  * Acte de naissance, au plus simple : (1) retrouver un acte et imprimer son extrait en un clic ; (2) saisir un
  * nouvel acte (enfant et parents seulement) puis « Enregistrer et imprimer ». En-tête, n°, date, officier et
- * certification viennent des réglages de la mairie, saisis une fois sur la plateforme Web.
+ * certification viennent des réglages de la mairie, saisis une fois (écran « Réglages de l'état civil », Web ou mobile).
  */
 export default function ActesScreen() {
   // Aperçu avant impression (adresse de la page imprimable, ou null).
@@ -38,6 +38,8 @@ export default function ActesScreen() {
   const [busy, setBusy] = useState(false);
 
   const { user } = useAuth();
+  const router = useRouter();
+  const canConfigure = (user?.permissions.includes('actes-naissance.configure') || user?.permissions.includes('actes-mariage.configure')) ?? false;
   const canSave = user?.permissions.includes(acte ? 'actes-naissance.update' : 'actes-naissance.create') ?? false;
   const canPrint = user?.permissions.includes('actes-naissance.deliver') ?? false;
 
@@ -173,7 +175,16 @@ export default function ActesScreen() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {settings && !settings.pret ? (
-          <Text style={styles.warning}>Réglez d'abord l'état civil de la mairie (centre et officier signataire) sur la plateforme Web.</Text>
+          <Text style={styles.warning}>
+            {canConfigure
+              ? 'Réglez d\'abord l\'état civil de la mairie (centre et officier signataire) : bouton ci-dessous.'
+              : 'L\'état civil de la mairie n\'est pas encore réglé (centre et officier signataire) : demandez au maire.'}
+          </Text>
+        ) : null}
+        {canConfigure ? (
+          <Button icon="cog-outline" mode="outlined" compact onPress={() => router.navigate('/etat-civil')} style={{ alignSelf: 'flex-end' }}>
+            Réglages de l'état civil
+          </Button>
         ) : null}
 
         {acte || results ? (

@@ -46,6 +46,7 @@ function HeaderLeft() {
       {can('demandes-vgt.create') ? <Menu.Item leadingIcon="card-account-details-outline" title="Vendre une vignette" onPress={() => go('/vignette')} /> : null}
       {can('actes-naissance.view') ? <Menu.Item leadingIcon="baby-face-outline" title="Acte de naissance" onPress={() => go('/actes')} /> : null}
       {can('actes-mariage.view') ? <Menu.Item leadingIcon="ring" title="Acte de mariage" onPress={() => go('/mariages')} /> : null}
+      {can('actes-naissance.configure') || can('actes-mariage.configure') ? <Menu.Item leadingIcon="cog-outline" title="Réglages de l'état civil" onPress={() => go('/etat-civil')} /> : null}
       {can('caisse.view_own') ? <Menu.Item leadingIcon="cash-register" title="Caisse" onPress={() => go('/caisse')} /> : null}
       <Menu.Item leadingIcon="account-circle-outline" title="Mon profil" onPress={() => go('/profile')} />
       <Divider />
@@ -117,6 +118,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="actes" options={{ href: can('actes-naissance.view') ? undefined : null, title: 'Naissance', tabBarIcon: tab('baby-face-outline') }} />
       <Tabs.Screen name="mariages" options={{ href: can('actes-mariage.view') ? undefined : null, title: 'Mariage', tabBarIcon: tab('ring') }} />
       <Tabs.Screen name="caisse" options={{ href: can('caisse.view_own') ? undefined : null, title: 'Caisse', tabBarIcon: tab('cash-register') }} />
+      {/* Réglages de l'état civil : écran sans onglet, ouvert depuis Naissance, Mariage ou le menu. */}
+      <Tabs.Screen name="etat-civil" options={{ href: null, title: 'Réglages de l\'état civil' }} />
       <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: tab('account-outline') }} />
     </Tabs>
   );
@@ -130,4 +133,5 @@ const titles: Record<string, string> = {
   mariages: 'Acte de mariage',
   caisse: 'Caisse',
   profile: 'Mon profil',
+  'etat-civil': 'Réglages de l\'état civil',
 };

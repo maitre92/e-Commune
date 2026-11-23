@@ -16,7 +16,7 @@ class LoginSlides
     public const EXTENSIONS = ['jpg', 'jpeg', 'webp', 'png'];
 
     /**
-     * @return list<array{file: string, icon: string, badge: string, title: string, text: string, position: string, image: ?string}>
+     * @return list<array{file: string, icon: string, badge: string, title: string, text: string, position: string, image: ?string, write?: bool}>
      */
     public function all(): array
     {
