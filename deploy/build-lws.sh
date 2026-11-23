@@ -28,7 +28,13 @@ git archive HEAD | tar -x -C "$APP"
 rm -rf "$APP/mobile" "$APP/tests" "$APP/docs" "$APP/deploy" \
        "$APP/phpunit.xml" "$APP/.editorconfig" "$APP/.npmrc" "$APP/.gitattributes" "$APP/.gitignore"
 
-(cd "$APP" && $COMPOSER_CMD install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress --no-scripts)
+# GitHub renvoie parfois des erreurs passagères (504) : jusqu'à 3 essais (le cache Composer garde ce qui est déjà téléchargé).
+for try in 1 2 3; do
+    (cd "$APP" && COMPOSER_PROCESS_TIMEOUT=600 $COMPOSER_CMD install --no-dev --prefer-dist --optimize-autoloader \
+        --no-interaction --no-progress --no-scripts) && break
+    [ "$try" = 3 ] && { echo "✘ composer install a échoué 3 fois : relancer plus tard."; exit 1; }
+    echo "⟳ Nouvel essai de composer install dans 10 s ($try/3)"; sleep 10
+done
 (cd "$APP" && $COMPOSER_CMD dump-autoload --no-dev --optimize --classmap-authoritative --no-interaction >/dev/null)
 # Les caches de dev (packages découverts localement avec les dépendances dev) ne doivent pas partir.
 rm -f "$APP"/bootstrap/cache/*.php
