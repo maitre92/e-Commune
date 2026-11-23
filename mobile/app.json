@@ -9,7 +9,6 @@
     "userInterfaceStyle": "light",
     "android": {
       "package": "ml.ecommune.mobile",
-      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "monochromeImage": "./assets/images/monochrome-icon.png",
@@ -51,11 +50,15 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "4b2dc8cc-96f3-40a5-bd1d-3a008e205995"
+      }
     },
     "description": "Application des agents de mairie : vignettes de motos, actes de naissance et de mariage, caisse.",
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "owner": "maitrebarry"
   }
 }
