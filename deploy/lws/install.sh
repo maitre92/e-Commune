@@ -22,6 +22,7 @@ FIRST_INSTALL=0
 
 # 2. Mise en maintenance pendant la mise à jour
 if [ "$FIRST_INSTALL" = 0 ]; then
+    grep -q '^DB_PASSWORD=.\+' "$APP_DIR/.env" || { echo "✘ DB_PASSWORD vide dans $APP_DIR/.env"; exit 1; }
     artisan down --retry=30 || true
     trap 'echo "✘ Échec : le site reste en maintenance. Corriger puis relancer, ou : php artisan up"' ERR
 fi
@@ -50,7 +51,6 @@ if [ "$FIRST_INSTALL" = 1 ]; then
     echo "   puis relancer ce script."
     exit 0
 fi
-grep -q '^DB_PASSWORD=.\+' "$APP_DIR/.env" || { echo "✘ DB_PASSWORD vide dans $APP_DIR/.env"; exit 1; }
 
 # 6. Base de données, permissions, caches
 artisan config:clear
