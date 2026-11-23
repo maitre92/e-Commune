@@ -25,3 +25,6 @@ Thumbs.db
 
 # Cahier des charges client (projet VigiMoto), hors de ce dépôt
 /docs/cahier_Plateforme.pdf
+
+# Archives de déploiement LWS
+/deploy/dist
